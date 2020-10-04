@@ -174,9 +174,9 @@ namespace FallGuysStats {
                     break;
             }
         }
-        private void SetFastestLabel(StatSummary levelInfo) {
+        private void SetFastestLabel(StatSummary levelInfo, LevelStats level) {
             if (!StatsForm.CurrentSettings.SwitchBetweenLongest) {
-                return;
+                switchCount = level.Type.FastestLabel();
             }
             switch (switchCount % (levelInfo.BestScore.HasValue ? 3 : 2)) {
                 case 0:
@@ -210,10 +210,8 @@ namespace FallGuysStats {
 
                 if (lastRound != null) {
                     lblName.Text = $"ROUND {lastRound.Round}:";
-
-                    string displayName = string.Empty;
-                    LevelStats.DisplayNameLookup.TryGetValue(lastRound.Name, out displayName);
-                    lblName.TextRight = displayName.ToUpper();
+                    
+                    lblName.TextRight = LevelStats.ALL.TryGetValue(lastRound.Name, out var level) ? level.Name.ToUpper() : String.Empty;
                     lblPlayers.TextRight = lastRound.Players.ToString();
 
                     float winChance = (float)levelInfo.TotalWins * 100f / (levelInfo.TotalShows == 0 ? 1 : levelInfo.TotalShows);
@@ -232,7 +230,7 @@ namespace FallGuysStats {
 
                     if (isTimeToSwitch) {
                         SetQualifyChanceLabel(levelInfo);
-                        SetFastestLabel(levelInfo);
+                        SetFastestLabel(levelInfo, level);
                         switchCount++;
                     }
 
